@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity(), QcyDevice.Listener {
             if (level > 0) setAnc(64 + level, "ANC L$level")
         }
 
-        val game = v<android.widget.SwitchMaterial>(R.id.swGame)
+        val game = v<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.swGame)
         game.setOnCheckedChangeListener { _, checked ->
             if (!v(R.id.swGame).isEnabled) return@setOnCheckedChangeListener
             lifecycleScope.launch { dev?.send(Protocol.CMD_LOW_LATENCY, byteArrayOf(if (checked) 1 else 2)) }
@@ -378,6 +378,9 @@ class MainActivity : AppCompatActivity(), QcyDevice.Listener {
         else -> if (value < 50) "Balance: L ${100 - value * 2}%" else "Balance: R ${value * 2 - 100}%"
     }
 
+    private fun toast(msg: String) =
+        android.widget.Toast.makeText(this, msg, android.widget.Toast.LENGTH_SHORT).show()
+
     private fun runOnUi(block: () -> Unit) { lifecycleScope.launch(Dispatchers.Main) { block() } }
 
     private fun log(line: String) {
@@ -420,7 +423,7 @@ class MainActivity : AppCompatActivity(), QcyDevice.Listener {
             // Per the product DB this firmware answers only Game (verified live);
             // the other toggles time out and are shown dimmed instead.
             request(Protocol.CMD_LOW_LATENCY, 900)?.let { g ->
-                v<android.widget.SwitchMaterial>(R.id.swGame).isChecked =
+                v<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.swGame).isChecked =
                     g.params.isNotEmpty() && g.params[0].toInt() == 1
             }
             readEq()
