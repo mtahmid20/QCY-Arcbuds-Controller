@@ -61,6 +61,8 @@ class MainActivity : AppCompatActivity(), QcyDevice.Listener {
 
     // -------------------------------------------------------------------- UI
 
+    // ---------------- Vista lookups: v<TextView>(R.id.x) for typed, v(R.id.x) for View
+    @JvmName("vPlain") // distinct JVM name avoids the erasure clash with the reified overload
     private fun v(id: Int): View = findViewById(id)
 
     private fun wireUi() {
