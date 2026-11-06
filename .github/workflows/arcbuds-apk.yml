@@ -16,8 +16,8 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - uses: android-actions/setup-android@v3
-
+      # The ubuntu-latest runner already ships a current Android SDK
+      # (ANDROID_HOME set, licenses pre-accepted) — no setup-android needed.
       - uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: "8.7"
