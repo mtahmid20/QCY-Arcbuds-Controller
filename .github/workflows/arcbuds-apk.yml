@@ -11,6 +11,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Keep ONE debug keystore across runs: otherwise every build has a
+      # different signature and the phone refuses to install over the
+      # previous APK ("App not installed").
+      - name: Restore debug keystore
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: arcbuds-debug-keystore-v1
+
+      - name: Generate debug keystore if missing
+        run: |
+          if [ ! -f ~/.android/debug.keystore ]; then
+            keytool -genkeypair -v \
+              -keystore ~/.android/debug.keystore \
+              -alias androiddebugkey \
+              -storepass android -keypass android \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
