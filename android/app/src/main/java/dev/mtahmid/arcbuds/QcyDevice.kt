@@ -76,14 +76,21 @@ class QcyDevice(val address: String) {
         val done = CompletableDeferred<Boolean>()
         descWrite = done
         g.setCharacteristicNotification(n, true)
-        val ok = try {
+        // on API 33+ the 2-arg writeDescriptor returns an Int GATT status,
+        // on older devices the legacy overload returns Boolean
+        val status = try {
             g.writeDescriptor(cccd, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
         } catch (e: NoSuchMethodError) {
             @Suppress("DEPRECATION")
             cccd.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
             g.writeDescriptor(cccd)
         }
-        if (!ok) return false.also { listener?.onLog("CCCD write rejected") }
+        val ok = when (status) {
+            is Boolean -> status
+            is Int -> status == BluetoothGatt.GATT_SUCCESS
+            else -> false
+        }
+        if (!ok) return false.also { listener?.onLog("CCCD write rejected (status $status)") }
         val descOk = withTimeoutOrNull(3000) { done.await() } ?: false
         if (descOk) listener?.onLog("notifications on (${svc.characteristics.size} chars in service)")
         return descOk
@@ -110,7 +117,9 @@ class QcyDevice(val address: String) {
         val g = gatt ?: return false
         val w = writeChar ?: return false
         val bytes = Protocol.buildOne(cmd, params)
-        val ok = synchronized(writeLock) {
+        // on API 33+ the 3-arg writeCharacteristic returns an Int GATT status,
+        // on older devices the legacy overload returns Boolean
+        val status = synchronized(writeLock) {
             listener?.onLog("tx  ${Protocol.hex(bytes)}")
             try {
                 g.writeCharacteristic(w, bytes, BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
@@ -125,7 +134,12 @@ class QcyDevice(val address: String) {
                 }
             }
         }
-        if (!ok) listener?.onLog("write rejected by stack")
+        val ok = when (status) {
+            is Boolean -> status
+            is Int -> status == BluetoothGatt.GATT_SUCCESS
+            else -> false
+        }
+        if (!ok) listener?.onLog("write rejected by stack (status $status)")
         return ok
     }
 

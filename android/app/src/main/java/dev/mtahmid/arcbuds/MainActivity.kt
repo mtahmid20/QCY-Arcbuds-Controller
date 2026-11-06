@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity(), QcyDevice.Listener {
     private var scanJob: Job? = null
 
     /** One merged EQ band (L/R averaged on read, as in the web UI). */
-    private class Band(val freq: Int, var gain: Float, var q: Float)
+    private class Band(var freq: Int, var gain: Float, var q: Float)
 
     private var eqBands: MutableList<Band> = mutableListOf()
     private var eqMaster = 0f
@@ -467,7 +467,9 @@ class MainActivity : AppCompatActivity(), QcyDevice.Listener {
         }
         // override garbage freqs with the known HT07 centres
         val CENTRES = intArrayOf(31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000)
-        merged.forEachIndexed { idx, band -> if (band.freq > 20000 || band.freq == 0) band.freq = CENTRES[idx] }
+        merged.forEachIndexed { idx, band ->
+            if ((band.freq > 20000 || band.freq == 0) && idx < CENTRES.size) band.freq = CENTRES[idx]
+        }
         eqBands = merged.toMutableList()
         rebuildEqUi()
         log("eq read (0x20, type ${p[0]})")
