@@ -252,9 +252,9 @@ class MainActivity : AppCompatActivity(), QcyDevice.Listener {
             runOnUi {
                 v<TextView>(R.id.tvStatus).text = name ?: "connected"
                 v<TextView>(R.id.tvModel).text = ""
+                setControlsEnabled(true)
+                if (name != null) v<TextView>(R.id.etName).setText(name)
             }
-            setControlsEnabled(true)
-            if (name != null) v<TextView>(R.id.etName).setText(name)
             refresh()
         }
     }
@@ -387,11 +387,15 @@ class MainActivity : AppCompatActivity(), QcyDevice.Listener {
 
     private fun log(line: String) {
         val at = DateFormat.format("HH:mm:ss", java.util.Date())
-        logLines.addLast("[$at] $line")
-        while (logLines.size > 300) logLines.removeFirst()
+        // mutating the deque happens under lock, because callers reach this
+        // from binder/IO threads too — only view updates are posted to main
+        val text = synchronized(logLines) {
+            logLines.addLast("[$at] $line")
+            while (logLines.size > 300) logLines.removeFirst()
+            logLines.joinToString("\n")
+        }
         runOnUi {
-            val tv = v<TextView>(R.id.tvLog)
-            tv.text = logLines.joinToString("\n")
+            v<TextView>(R.id.tvLog).text = text
             v<android.widget.ScrollView>(R.id.logScroll).fullScroll(View.FOCUS_DOWN)
         }
     }
@@ -401,32 +405,42 @@ class MainActivity : AppCompatActivity(), QcyDevice.Listener {
     private suspend fun refresh() {
         val q = dev ?: return
         try {
-            request(Protocol.CMD_BATTERY)?.let { renderBattery(it.params) }
-            request(Protocol.CMD_VERSION)?.let { p ->
-                v<TextView>(R.id.tvVersion).text = "firmware ${versionText(p.params)}"
-            }
-            request(Protocol.CMD_NOISE_CANCEL)?.let { if (it.params.isNotEmpty()) renderAnc(it.params[0].toInt() and 0xFF) }
-            request(Protocol.CMD_VOLUME)?.let { vol ->
-                if (vol.params.size >= 2) {
-                    val max = (vol.params.getOrNull(2)?.toInt() ?: 0xFF).coerceIn(50, 0xFF)
-                    val sb = v<SeekBar>(R.id.seekVol)
-                    sb.max = max
-                    sb.progress = vol.params[0].toInt() and 0xFF
-                    v<TextView>(R.id.tvVol).text = "Volume: ${vol.params[0].toInt() and 0xFF}/$max"
-                }
-            }
-            request(Protocol.CMD_BALANCE)?.let { bal ->
-                if (bal.params.isNotEmpty()) {
-                    val value = bal.params[0].toInt() and 0xFF
-                    v<SeekBar>(R.id.seekBal).progress = value
-                    v<TextView>(R.id.tvBal).text = balanceLabel(value)
-                }
-            }
+            // gather responses on the calling (IO) thread…
+            val battery = request(Protocol.CMD_BATTERY)
+            val version = request(Protocol.CMD_VERSION)
+            val anc = request(Protocol.CMD_NOISE_CANCEL)
+            val vol = request(Protocol.CMD_VOLUME)
+            val bal = request(Protocol.CMD_BALANCE)
             // Per the product DB this firmware answers only Game (verified live);
             // the other toggles time out and are shown dimmed instead.
-            request(Protocol.CMD_LOW_LATENCY, 900)?.let { g ->
-                v<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.swGame).isChecked =
-                    g.params.isNotEmpty() && g.params[0].toInt() == 1
+            val game = request(Protocol.CMD_LOW_LATENCY, 900)
+            // …then apply every UI change on the main thread.
+            runOnUi {
+                battery?.let { renderBattery(it.params) }
+                version?.let { p ->
+                    v<TextView>(R.id.tvVersion).text = "firmware ${versionText(p.params)}"
+                }
+                anc?.let { if (it.params.isNotEmpty()) renderAnc(it.params[0].toInt() and 0xFF) }
+                vol?.let { volPkt ->
+                    if (volPkt.params.size >= 2) {
+                        val max = (volPkt.params.getOrNull(2)?.toInt() ?: 0xFF).coerceIn(50, 0xFF)
+                        val sb = v<SeekBar>(R.id.seekVol)
+                        sb.max = max
+                        sb.progress = volPkt.params[0].toInt() and 0xFF
+                        v<TextView>(R.id.tvVol).text = "Volume: ${volPkt.params[0].toInt() and 0xFF}/$max"
+                    }
+                }
+                bal?.let { b ->
+                    if (b.params.isNotEmpty()) {
+                        val value = b.params[0].toInt() and 0xFF
+                        v<SeekBar>(R.id.seekBal).progress = value
+                        v<TextView>(R.id.tvBal).text = balanceLabel(value)
+                    }
+                }
+                game?.let { g ->
+                    v<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.swGame).isChecked =
+                        g.params.isNotEmpty() && g.params[0].toInt() == 1
+                }
             }
             readEq()
         } catch (e: Exception) {
@@ -473,7 +487,7 @@ class MainActivity : AppCompatActivity(), QcyDevice.Listener {
             if ((band.freq > 20000 || band.freq == 0) && idx < CENTRES.size) band.freq = CENTRES[idx]
         }
         eqBands = merged.toMutableList()
-        rebuildEqUi()
+        runOnUi { rebuildEqUi() }
         log("eq read (0x20, type ${p[0]})")
     }
 
