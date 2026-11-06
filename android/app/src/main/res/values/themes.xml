@@ -1,0 +1,42 @@
+<resources>
+    <style name="Theme.ArcBuds" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="CardTitle">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0.1</item>
+        <item name="android:alpha">0.7</item>
+        <item name="android:layout_marginTop">22dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+    </style>
+
+    <style name="BtnRow">
+        <item name="android:paddingHorizontal">2dp</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <style name="SegBtn">
+        <item name="android:layout_marginHorizontal">3dp</item>
+    </style>
+
+    <style name="BatteryCell">
+        <item name="android:gravity">center</item>
+        <item name="android:padding">6dp</item>
+    </style>
+
+    <style name="BatteryValue">
+        <item name="android:textSize">30sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFeatureSettings">tnum</item>
+    </style>
+
+    <style name="BatteryLabel">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:alpha">0.7</item>
+        <item name="android:letterSpacing">0.09</item>
+    </style>
+</resources>

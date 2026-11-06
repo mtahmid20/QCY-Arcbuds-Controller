@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- status + connection buttons -->
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:text="Disconnected"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvModel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp" />
+
+        <LinearLayout
+            style="@style/BtnRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/btnConnect"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Connect earbuds" />
+
+            <Button
+                android:id="@+id/btnDisconnect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:text="Disconnect" />
+
+            <Button
+                android:id="@+id/btnRefresh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:text="Refresh" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvConnNote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:alpha="0.7"
+            android:text="Disconnect the buds from the phone's Bluetooth settings first (an old link blocks a new one), then take them out of the case. The app finds them by their QCY advertisement automatically — no picker." />
+
+        <!-- battery -->
+        <TextView style="@style/CardTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="BATTERY" />
+        <LinearLayout style="@style/BtnRow" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <LinearLayout style="@style/BatteryCell" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
+                <TextView android:id="@+id/batL" style="@style/BatteryValue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="–" />
+                <TextView style="@style/BatteryLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="left" />
+            </LinearLayout>
+            <LinearLayout style="@style/BatteryCell" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
+                <TextView android:id="@+id/batR" style="@style/BatteryValue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="–" />
+                <TextView style="@style/BatteryLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="right" />
+            </LinearLayout>
+            <LinearLayout style="@style/BatteryCell" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
+                <TextView android:id="@+id/batC" style="@style/BatteryValue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="–" />
+                <TextView style="@style/BatteryLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="case" />
+            </LinearLayout>
+        </LinearLayout>
+        <TextView
+            android:id="@+id/tvVersion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:alpha="0.7" />
+
+        <!-- ANC -->
+        <TextView style="@style/CardTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="NOISE CONTROL" />
+        <LinearLayout style="@style/BtnRow" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <Button android:id="@+id/btnAncNormal" style="@style/SegBtn" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:enabled="false" android:text="Normal" />
+            <Button android:id="@+id/btnAncOn" style="@style/SegBtn" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:enabled="false" android:text="ANC" />
+            <Button android:id="@+id/btnAncTr" style="@style/SegBtn" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:enabled="false" android:text="Transparency" />
+        </LinearLayout>
+        <TextView
+            android:id="@+id/tvAncStrength"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:text="ANC strength: –" />
+        <SeekBar
+            android:id="@+id/seekAncStrength"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="3"
+            android:enabled="false" />
+
+        <!-- levels -->
+        <TextView style="@style/CardTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="LEVELS" />
+        <TextView
+            android:id="@+id/tvVol"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:text="Volume: –" />
+        <SeekBar
+            android:id="@+id/seekVol"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:enabled="false" />
+        <TextView
+            android:id="@+id/tvBal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:text="Balance: center" />
+        <SeekBar
+            android:id="@+id/seekBal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:enabled="false" />
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/swGame"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="Game / low latency" />
+
+        <!-- equalizer -->
+        <TextView style="@style/CardTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="EQUALIZER" />
+        <TextView
+            android:id="@+id/tvEqMeta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:alpha="0.7"
+            android:text="Connect to read the current EQ from the device." />
+        <LinearLayout
+            android:id="@+id/eqList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp" />
+        <LinearLayout style="@style/BtnRow" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <Button android:id="@+id/btnEqRead" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:enabled="false" android:text="Read" />
+            <Button android:id="@+id/btnEqWrite" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:enabled="false" android:text="Apply" />
+            <Button android:id="@+id/btnEqFlat" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:enabled="false" android:text="Flatten" />
+            <Button android:id="@+id/btnEqBass" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:enabled="false" android:text="Bass+" />
+        </LinearLayout>
+
+        <!-- device -->
+        <TextView style="@style/CardTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="DEVICE" />
+        <LinearLayout style="@style/BtnRow" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/etName"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:maxLength="28"
+                android:hint="Bluetooth name"
+                android:inputType="text" />
+            <Button
+                android:id="@+id/btnRename"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:text="Rename" />
+        </LinearLayout>
+        <Spinner
+            android:id="@+id/spinAutoOff"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:enabled="false" />
+        <Button
+            android:id="@+id/btnReset"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="Reset settings" />
+
+        <!-- packet console -->
+        <TextView style="@style/CardTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="PACKET CONSOLE — for protocol work" />
+        <LinearLayout style="@style/BtnRow" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/etHex"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:hint="e.g. fe 01 2f (cmd payload)"
+                android:inputType="text"
+                android:fontFamily="monospace"
+                android:textSize="12sp" />
+            <Button
+                android:id="@+id/btnHexSend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:text="Send" />
+        </LinearLayout>
+        <ScrollView
+            android:id="@+id/logScroll"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:background="#0a0e13"
+            android:padding="8dp">
+            <TextView
+                android:id="@+id/tvLog"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:textSize="11sp"
+                android:textColor="#9fb2c6"
+                android:text="idle — connect to see traffic" />
+        </ScrollView>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:textSize="11sp"
+            android:alpha="0.7"
+            android:text="Commands go straight to the buds. 03 00 factory-resets, 02 00 clears pairing. Full reference: docs/protocol.md." />
+
+    </LinearLayout>
+</ScrollView>
